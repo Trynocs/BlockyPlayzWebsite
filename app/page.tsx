@@ -1,101 +1,194 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { FaDiscord, FaStore } from "react-icons/fa";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { buttonVariants } from "@/components/ui/button";
+import { Dock, DockIcon } from "@/components/ui/dock";
+import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
+import LetterPullup from "@/components/ui/letter-pullup";
+import MorphingText from "@/components/ui/morphing-text";
+import { RainbowButton } from "@/components/ui/rainbow-button";
+import { HomeIcon } from "lucide-react";
+
+const NAVIGATION = {
+  navbar: [{ href: "/", icon: HomeIcon, label: "Home" }],
+  social: {
+    Discord: {
+      name: "Discord",
+      url: "https://discord.gg/fAnBdezVeQ",
+      icon: FaDiscord,
+    },
+    Store: {
+      name: "Store",
+      url: "/Store",
+      icon: FaStore,
+    },
+  },
+};
+
+const texts = ["Citybuild", "Gute Wirtschaft", "Netter Support", "Werwolf"];
+
+interface HeroProps {
+  onFooterVisible: (visible: boolean) => void;
+}
+
+const Hero = ({ onFooterVisible }: HeroProps) => {
+  const [contentVisible, setContentVisible] = useState(false);
+  const [navbarVisible, setNavbarVisible] = useState(false);
+  const [buttonVisible, setButtonVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setContentVisible(true);
+      setNavbarVisible(true);
+      setButtonVisible(true);
+      onFooterVisible(true); // Footer sichtbar machen
+    }, 4400);
+
+    return () => clearTimeout(timer);
+  }, [onFooterVisible]);
+
+  return (
+    <section className="relative min-h-[80vh] flex items-center justify-center flex-col space-y-6">
+      {/* Navbar */}
+      <div className={navbarVisible ? "opacity-100" : "opacity-0"}>
+        <Navigation />
+        <br></br>
+        <br></br>
+        <br></br>
+      </div>
+
+      {/* Title Animation */}
+      <div className="w-full text-center">
+        <LetterPullup
+          words={"BlockyPlayz"}
+          delay={0.3}
+          className="font-minecraft text-[1000px] text-white inline-block tracking-[.25em]"
+        />
+      </div>
+      <br></br>
+      <br></br>
+
+      {/* Button */}
+      <div className={buttonVisible ? "transition-opacity opacity-100" : "opacity-0"}>
+        <RainbowButton onClick={copyIP} className="px-[35px] py-[35px] text-5xl">Join jetzt!</RainbowButton>
+      </div>
+
+      {/* Server Status */}
+
+      {/* Morphing Text */}
+      <div
+        className={
+          contentVisible 
+            ? "fade-in transition-opacity opacity-100 w-full text-center space-y-8" 
+            : "opacity-0"
+        }
+      >
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <MorphingText
+          texts={texts}
+          className="font-minecraft text-white text-4xl mx-auto leading-[1.5em]"
+        />
+      </div>
+    </section>
+  );
+};
+
+const Navigation = () => (
+  <nav className="fixed top-0 left-0 right-0 z-50 py-4 backdrop-blur-sm">
+    <TooltipProvider>
+      <Dock direction="middle">
+        {NAVIGATION.navbar.map((item) => (
+          <DockIcon key={item.label}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href={item.href}
+                  aria-label={item.label}
+                  className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
+                >
+                  <item.icon className="size-4" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="font-minecraft">{item.label}</p>
+              </TooltipContent>
+            </Tooltip>
+          </DockIcon>
+        ))}
+
+        {Object.entries(NAVIGATION.social).map(([name, social]) => (
+          <DockIcon key={name}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href={social.url}
+                  aria-label={social.name}
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon" }),
+                    "size-12 rounded-full text-white hover:text-emerald-400"
+                  )}
+                >
+                  <social.icon className="size-4" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="font-minecraft">{name}</p>
+              </TooltipContent>
+            </Tooltip>
+          </DockIcon>
+        ))}
+      </Dock>
+    </TooltipProvider>
+  </nav>
+);
+
+interface FooterProps {
+  visible: boolean;
+}
+
+const Footer = ({ visible }: FooterProps) => (
+  <footer
+    className={`py-8 backdrop-blur-sm bg-black/20 sticky bottom-0 w-full z-50 transition-opacity ${
+      visible ? "opacity-100" : "opacity-0"
+    }`}
+  >
+    <div className="container mx-auto px-4 text-center">
+      <p className="text-gray-400">2024 BlockyPlayz.de - All rights reserved</p>
+    </div>
+  </footer>
+);
+
+function copyIP() {
+  const copyText = "blockyplayz.de";
+  navigator.clipboard.writeText(copyText).then(
+    () => alert(`IP kopiert: ${copyText}\nStrg + V zum Einfügen`),
+    (err) => console.log("Something went wrong", err)
+  );
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [footerVisible, setFooterVisible] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  return (
+    <main className="relative min-h-screen bg-gray-900 text-white flex flex-col">
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.05}
+        duration={3}
+        repeatDelay={1}
+        className="fixed right-0 top-0 h-screen transform-gpu -skew-x-12 opacity-100"
+      />
+      <div className="flex-grow">
+        <Hero onFooterVisible={setFooterVisible} />
+      </div>
+      <Footer visible={footerVisible} />
+    </main>
   );
 }
